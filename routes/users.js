@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+//User Model
+const User = require('../models/User')
+
 //Login Page
 router.get('/login', (request, response) => response.render('Login'));
 
@@ -36,7 +39,33 @@ router.post('/register', (req, res) => {
             password2
         });
     } else {
-        res.send('pass');
+        //Access Granted 
+        User.findOne({ email: email })
+        .then(user => {
+            if(user) {
+                //User Exists
+                errors.push({ msg: 'Email is already in use'});
+                res.render('register', {
+                    errors: errors,
+                    name: name,
+                    email: email,
+                    password: password,
+                    password2: password2
+                });
+            } else {
+                const newUser = new User({
+                    name: name,
+                    email: email,
+                    password: password
+                });
+
+                newUser.save()
+                    .then(user => {
+                        res.redirect('/users/login');
+                    })
+                    .catch(err => console.log(err));
+            }
+        });
     }
 });
 
