@@ -1,8 +1,12 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const app = express(); 
+
+//Passport configuration
+require('./config/passport')(passport);
 
 // DB Config
 const db = require('./config/keys').MongoURI;
@@ -14,6 +18,10 @@ mongoose.connect(db, { useNewUrlParser:true })
 
 // Bodyparser
 app.use(express.urlencoded({ extended: false }));
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // EJS
 app.use(expressLayouts);
